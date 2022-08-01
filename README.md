@@ -4,7 +4,7 @@ A GIMP plugin to quickly convert images of text into editable text layers using 
 
 ## DEMO
 
-[Watch the demonstraction video on YouTube](https://www.youtube.com/watch?v=fCOGOqIhByM)
+[Watch the demonstration video on YouTube](https://www.youtube.com/watch?v=fCOGOqIhByM)
 
 ## Install Instructions
 
