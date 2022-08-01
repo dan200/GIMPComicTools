@@ -2,7 +2,7 @@
 
 A GIMP plugin to quickly convert images of text into text layers using the [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine.
 
-## Demo
+## DEMO
 
 [Watch the demonstraction video on YouTube](https://www.youtube.com/watch?v=fCOGOqIhByM)
 
