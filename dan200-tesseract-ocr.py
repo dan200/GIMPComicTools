@@ -13,8 +13,8 @@ import xml.etree.ElementTree as ET
 
 # The location of tesseract.exe
 # Edit these variables if tesseeract is installed in a different location
-TESSERACT_PATH = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 TESSERACT_EXE = "tesseract.exe"
+TESSERACT_PATH = "C:\\Program Files\\Tesseract-OCR\\" + TESSERACT_EXE
 
 OCR_MODE_WORDS = 0
 OCR_MODE_LINES = 1
