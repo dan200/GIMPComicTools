@@ -1,14 +1,24 @@
-# Tesseract OCR for GIMP
+# Comic Tools for GIMP
 
-A GIMP plugin to quickly convert images of text into editable text layers using the [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine.
+A selection of GIMP plugins useful for remastering comic books.
+To install these plugins, download this repository to your computer, and add the folder to your GIMP plug-ins path using the "Edit > Preferences > Folders > Plugin-ins" menu.
 
-## Demo
+## Tesseract OCR
+
+A plugin to quickly convert images of text into editable text layers using the [Tesseract](https://github.com/tesseract-ocr/tesseract) OCR engine.
 
 [Watch the demonstration video on YouTube](https://www.youtube.com/watch?v=fCOGOqIhByM)
 
-## Install Instructions
+To use this plugin, you will need to download and install the Tesseract OCR engine. Prebuilt binaries are available for download from [here](https://tesseract-ocr.github.io/tessdoc/Home.html#binaries).
 
-1. Download this GitHub repository (by clicking "Code" then "Download ZIP" in the top right corner of this page)
-2. Extract the contents to your GIMP "plug-ins" folder. On Windows, this will be something like: *C:\Users\\<your_name_here\>\AppData\Roaming\GIMP\2.10\plug-ins*
-3. Download and install the Tesseract OCR engine. Prebuilt binaries are available for download [here](https://tesseract-ocr.github.io/tessdoc/Home.html#binaries).
-4. (Optional) If you installed Tesseract to a custom location, or you're not using Windows, open *dan200-tesseract-ocr.py* in a text editor and change the *TESSERACT_PATH* variable to point to your new install location. Otherwise, you can skip this step.
+## Real-ESRGAN Upscale
+
+A plugin to upscale images using the Real-ESRGAN upscaling engine.
+
+[Watch the demonstration video on YouTube](https://youtu.be/8r96fbb3aFY)
+
+To use this plugin, you will need to download the Real-ESRGAN upscaling engine. Prebuilt binaries are available for download from [here](https://github.com/xinntao/Real-ESRGAN).
+
+## Mirror Bleed
+
+A plugin to add mirrored bleed margins for preparing images for print.

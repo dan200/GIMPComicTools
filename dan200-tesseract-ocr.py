@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 
 # The location of tesseract.exe
 # Edit these variables if tesseeract is installed in a different location
+# Tesseract OCR can be downloaded from https://github.com/tesseract-ocr/tesseract#installing-tesseract
 TESSERACT_EXE = "tesseract.exe"
 TESSERACT_PATH = "C:\\Program Files\\Tesseract-OCR\\" + TESSERACT_EXE
 
@@ -65,7 +66,7 @@ def measure_font_metrics(fontName, testText) :
     result["lineHeightToFontSize"] = float(testFontSize) / float(h)
     return result
 
-def add_text_in_box(img, parentLayer, text, fontName, x, y, w, h) :
+def add_text_in_box(img, parentLayer, text, fontName, x, y, w, h, autoSpacing) :
     # Split the text into lines
     lines = text.splitlines()
 
@@ -83,31 +84,31 @@ def add_text_in_box(img, parentLayer, text, fontName, x, y, w, h) :
     fontSize = int( round( lineHeight * firstLineFontMetrics["lineHeightToFontSize"] ) )
 
     # Determine the letter spacing
-    if len(lines) <= 1:
-        longestLine = text
-        longestLineWidth,_,_,_ = gimp.pdb.gimp_text_get_extents_fontname(text, fontSize, PIXELS, fontName)
-    else:
-        longestLine = ""
-        longestLineWidth = 0
-        for line in lines:
-            lineWidth,_,_,_ = gimp.pdb.gimp_text_get_extents_fontname(line, fontSize, PIXELS, fontName)
-            if lineWidth > longestLineWidth:
-                longestLine = line
-                longestLineWidth = lineWidth
-    numLetterSpacesInLongestLine = len(longestLine) - 1
-    if numLetterSpacesInLongestLine > 0:
-        letterSpacing = float(w - longestLineWidth) / float(numLetterSpacesInLongestLine)
-    else:
-        letterSpacing = 0
+    letterSpacing = 0
+    if autoSpacing:
+        if len(lines) <= 1:
+            longestLine = text
+            longestLineWidth,_,_,_ = gimp.pdb.gimp_text_get_extents_fontname(text, fontSize, PIXELS, fontName)
+        else:
+            longestLine = ""
+            longestLineWidth = 0
+            for line in lines:
+                lineWidth,_,_,_ = gimp.pdb.gimp_text_get_extents_fontname(line, fontSize, PIXELS, fontName)
+                if lineWidth > longestLineWidth:
+                    longestLine = line
+                    longestLineWidth = lineWidth
+        numLetterSpacesInLongestLine = len(longestLine) - 1
+        if numLetterSpacesInLongestLine > 0:
+            letterSpacing = float(w - longestLineWidth) / float(numLetterSpacesInLongestLine)
 
     # Determine the line spacing
     fullHeight = h + header + footer
-    if len(lines) <= 1:
-        lineSpacing = 0
-    else:
-        numLineSpaces = len(lines) - 1
-        _,outputTextHeight,_,_ = gimp.pdb.gimp_text_get_extents_fontname(text, fontSize, PIXELS, fontName)
-        lineSpacing = float(fullHeight - outputTextHeight) / float(numLineSpaces)
+    lineSpacing = 0;
+    if autoSpacing:
+        if len(lines) > 1:
+            numLineSpaces = len(lines) - 1
+            _,outputTextHeight,_,_ = gimp.pdb.gimp_text_get_extents_fontname(text, fontSize, PIXELS, fontName)
+            lineSpacing = float(fullHeight - outputTextHeight) / float(numLineSpaces)
 
     # Add the text
     xPadding = 10
@@ -121,7 +122,7 @@ def get_box_from_xml_element(element) :
     h = int(element.get("HEIGHT"))
     return x, y, w, h
 
-def OCR_current_selection(img, inputLayer, outputLayerGroup, bgLayer, fontName, mode) :
+def OCR_current_selection(img, inputLayer, outputLayerGroup, bgLayer, fontName, mode, autoSpacing) :
     # Get selection bounds
     _, x1, y1, _, _ = gimp.pdb.gimp_selection_bounds(img)
 
@@ -159,7 +160,7 @@ def OCR_current_selection(img, inputLayer, outputLayerGroup, bgLayer, fontName, 
                             for stringObj in textLineObj.findall("alto:String", ns):
                                 content = stringObj.get("CONTENT")
                                 x, y, w, h = get_box_from_xml_element(stringObj)
-                                add_text_in_box(img, outputLayerGroup, content, fontName, x1 + x, y1 + y, w, h)
+                                add_text_in_box(img, outputLayerGroup, content, fontName, x1 + x, y1 + y, w, h, autoSpacing)
                                 gimp.pdb.gimp_displays_flush()
 
     elif mode == OCR_MODE_LINES:
@@ -174,7 +175,7 @@ def OCR_current_selection(img, inputLayer, outputLayerGroup, bgLayer, fontName, 
                             for stringObj in textLineObj.findall("alto:String", ns):
                                 content = content + stringObj.get("CONTENT") + " "
                             content = content.strip(" ")
-                            add_text_in_box(img, outputLayerGroup, content, fontName, x1 + x, y1 + y, w, h)
+                            add_text_in_box(img, outputLayerGroup, content, fontName, x1 + x, y1 + y, w, h, autoSpacing)
                             gimp.pdb.gimp_displays_flush()
 
     elif mode == OCR_MODE_BLOCKS:
@@ -190,17 +191,17 @@ def OCR_current_selection(img, inputLayer, outputLayerGroup, bgLayer, fontName, 
                                 content = content + stringObj.get("CONTENT") + " "                                    
                             content = content.strip(" ") + "\n"
                     content = content.strip("\n")
-                    add_text_in_box(img, outputLayerGroup, content, fontName, x1 + x, y1 + y, w, h)
+                    add_text_in_box(img, outputLayerGroup, content, fontName, x1 + x, y1 + y, w, h, autoSpacing)
                     gimp.pdb.gimp_displays_flush()
 
     # Clean up
     os.remove(tempImagePath)
     os.remove(tempXMLPath)
 
-def dan200_tesseract_ocr(img, layer, fontName, outputGroupName, lineByLine) :
+def dan200_tesseract_ocr(img, layer, fontName, outputGroupName, lineByLine, autoSpacing) :
     # Check tesseract is installed
     if not os.path.exists(TESSERACT_PATH):
-        gimp.message("Could not find " + TESSERACT_PATH + "\nSee README.md for install instructions.")
+        gimp.message("Could not find " + TESSERACT_PATH + "\nTesseract OCR can be downloaded from https://github.com/tesseract-ocr/tesseract")
         return
 
     # Check the current selection
@@ -260,7 +261,7 @@ def dan200_tesseract_ocr(img, layer, fontName, outputGroupName, lineByLine) :
 
             # OCR the new selection
             ocrMode = OCR_MODE_LINES if lineByLine else OCR_MODE_BLOCKS
-            OCR_current_selection(img, layer, ocrLayerGroup, bgLayer, fontName, ocrMode)
+            OCR_current_selection(img, layer, ocrLayerGroup, bgLayer, fontName, ocrMode, autoSpacing)
 
         # Delete the temporary paths
         gimp.pdb.gimp_image_remove_vectors(img, wholeSelectionPath)
@@ -283,12 +284,13 @@ register(
     "Daniel Ratcliffe",
     "Daniel Ratcliffe",
     "2022",
-    "<Image>/Tools/Tesseract OCR",
+    "<Image>/Tools/Comic Tools/Tesseract OCR",
     "RGB*, GRAY*",
     [
         (PF_FONT, "fontName", "Output font", "Arial"),
         (PF_STRING, "outputGroupName", "Output layer group name", "OCR"),
         (PF_BOOL, "lineByLine", "Output each line seperately", False),
+        (PF_BOOL, "autoSpacing", "Adjust spacing automatically", False)
     ],
     [],
     dan200_tesseract_ocr)
