@@ -108,7 +108,7 @@ register(
     "Daniel Ratcliffe",
     "Daniel Ratcliffe",
     "2022",
-    "<Image>/Tools/ComicTools/Real-ESRGAN Upscale",
+    "<Image>/Tools/Comic Tools/Real-ESRGAN Upscale",
     "RGB*, GRAY*",
     [
         (PF_SPINNER, "scale", "Scale", 4, (2, 4, 1)),
