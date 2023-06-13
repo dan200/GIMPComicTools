@@ -75,7 +75,7 @@ def upscale_layer(img, layer, scale) :
             os.remove(tempImagePath)
             os.remove(tempOutputImagePath)
 
-def dan200_realesrgan_upscale(img, layer, scale) :
+def dan200_realesrgan_upscale(img, layer, scale, currentLayerOnly) :
     # Check realesrgan is installed
     if not os.path.exists(REALESRGAN_PATH):
         gimp.message("Could not find " + REALESRGAN_PATH + "\Real-ESRGAN can be downloaded from https://github.com/xinntao/Real-ESRGAN")
@@ -86,13 +86,17 @@ def dan200_realesrgan_upscale(img, layer, scale) :
     gimp.pdb.gimp_image_undo_group_start(img)
 
     try:
-        # Resize each layer
         gimp.pdb.gimp_selection_none(img)
-        for layer in img.layers:
+        if currentLayerOnly:
+            # Resize the current layer
             upscale_layer(img, layer, scale)
+        else:
+            # Resize each layer
+            for layer in img.layers:
+                upscale_layer(img, layer, scale)
 
-        # Resize the image
-        gimp.pdb.gimp_image_resize_to_layers(img)
+            # Resize the image
+            gimp.pdb.gimp_image_resize_to_layers(img)
 
     except Exception as err:
         gimp.message("Unexpected error: " + str(err))
@@ -112,6 +116,7 @@ register(
     "RGB*, GRAY*",
     [
         (PF_SPINNER, "scale", "Scale", 4, (2, 4, 1)),
+        (PF_BOOL, "currentLayerOnly", "Current Layer Only", False)
     ],
     [],
     dan200_realesrgan_upscale)
