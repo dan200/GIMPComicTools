@@ -22,3 +22,7 @@ To use this plugin, you will need to download the Real-ESRGAN upscaling engine. 
 ## Mirror Bleed
 
 A plugin to add mirrored bleed margins for preparing images for print.
+
+## Replace Font
+
+A plugin to change the font of all text layers in the image at once

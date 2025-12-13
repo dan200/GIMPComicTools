@@ -91,6 +91,7 @@ def add_bleed_to_layer(img, layer, left, right, top, bottom) :
                 if bottomMargin > 0:
                     copy_move_and_flip(img, layer, x, y + h - bottomMargin - 1, w, bottomMargin, x, y + h, ORIENTATION_VERTICAL)
 
+
 def dan200_mirror_bleed(img, layer, left, right, top, bottom) :
     # Start
     gimp.progress_init("Please wait ...")
